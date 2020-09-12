@@ -451,9 +451,9 @@ def graficar_covid_total():
     fig.write_html('../templates/grafica_covid_total.html')
 
 def limpiar_casos_estados(df,estados):
-    df = df[['ENTIDAD_NAC','ENTIDAD_RES','FECHA_INGRESO','FECHA_DEF','RESULTADO']]
+    df = df[['ENTIDAD_RES','FECHA_INGRESO','RESULTADO']]
     df = pd.merge(df,estados,left_on='ENTIDAD_RES',right_on='cve',how='left')
-    df = df.drop(['ENTIDAD_NAC','ENTIDAD_RES'],axis=1)
+    df = df.drop(['ENTIDAD_RES'],axis=1)
     casos_edos = df[df.RESULTADO == 1]
     casos_edos['casos_diarios'] = casos_edos.groupby(['NAME','FECHA_INGRESO'])['RESULTADO'].transform('sum')
     casos_edos = casos_edos[['FECHA_INGRESO','NAME','casos_diarios']]
@@ -492,19 +492,78 @@ def graficar_heatmap_covid():
 
 
 def graficar_mapa_covid():
-    global covid, estados, geojson
+    global covid,estados,geojson
     casos_edos = limpiar_casos_estados(covid,estados)
-    var_pivote = casos_edos.pivot('NAME','FECHA_INGRESO','variacion_diaria')
+    defunciones_edos = limpiar_casos_estados(covid[covid.FECHA_DEF!='9999-99-99'],estados)
+    var_casos_pivote = casos_edos.pivot('NAME','FECHA_INGRESO','variacion_diaria')
+    var_defs_pivote = defunciones_edos.pivot('NAME','FECHA_INGRESO','variacion_diaria')
+    casos_pivote = casos_edos.pivot('NAME','FECHA_INGRESO','casos_diarios')
+    defs_pivote = defunciones_edos.pivot('NAME','FECHA_INGRESO','casos_diarios')
     geodata = estados[:32].copy(deep=True)
-    geodata['Variación promedio'] = var_pivote.iloc[:,-8:-1].mean(axis=1).to_list()
-    fig = px.choropleth_mapbox(geodata,geojson=geojson,locations='CODE',color='Variación promedio',
-                                featureidkey="properties.CODE",mapbox_style="carto-positron",
-                                color_continuous_scale='reds',center={'lat':23.7,'lon':-103},
-                                zoom=4,hover_name='NAME',
-                                hover_data={'Variación promedio':':>7.2%',
-                                            'CODE':False})
-    fig.update_layout(coloraxis_colorbar=dict(title="Variación promedio<br>en la última semana</br>"))
-    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0},height=600,width=1000)
+    geodata['Variación promedio de casos'] = var_casos_pivote.iloc[:,-8:-1].mean(axis=1).to_list()
+    geodata['Variación promedio de defunciones'] = var_defs_pivote.iloc[:,-8:-1].mean(axis=1).to_list()
+    geodata['Promedio de casos'] = casos_pivote.iloc[:,-8:-1].mean(axis=1).to_list()
+    geodata['Promedio de defunciones'] = defs_pivote.iloc[:,-8:-1].mean(axis=1).to_list()
+    data = [go.Choroplethmapbox(locations = geodata['CODE'],
+                                z = geodata['Variación promedio de casos'],
+                                colorscale = 'reds',
+                                geojson = geojson,
+                                featureidkey="properties.CODE",visible=True,
+                                customdata=geodata['NAME'],
+                                colorbar = dict(title="Variación promedio<br>en la última semana</br>",
+                                                tickformat='%'),
+                                hovertemplate='<b>%{customdata}</b><br>Variación promedio: %{z:>7.2%}</br><extra></extra>')]
+    data.append(go.Choroplethmapbox(locations = geodata['CODE'],
+                                z = geodata['Variación promedio de defunciones'],
+                                colorscale = 'reds',
+                                geojson = geojson,
+                                featureidkey="properties.CODE",visible=False,
+                                customdata=geodata['NAME'],
+                                colorbar = dict(title="Variación promedio<br>en la última semana</br>"),
+                                hovertemplate='<b>%{customdata}</b><br>Variación promedio: %{z:>7.2%}</br><extra></extra>'))
+    data.append(go.Choroplethmapbox(locations = geodata['CODE'],
+                                z = geodata['Promedio de casos'],
+                                colorscale = 'reds',
+                                geojson = geojson,
+                                featureidkey="properties.CODE",visible=False,
+                                customdata=geodata['NAME'],
+                                colorbar = dict(title="Casos promedio<br>en la última semana</br>"),
+                                hovertemplate='<b>%{customdata}</b><br>Casos promedio: %{z:>7.2f}</br><extra></extra>'))
+    data.append(go.Choroplethmapbox(locations = geodata['CODE'],
+                                z = geodata['Promedio de defunciones'],
+                                colorscale = 'reds',
+                                geojson = geojson,
+                                featureidkey="properties.CODE",visible=False,
+                                customdata=geodata['NAME'],
+                                colorbar = dict(title="Defunciones promedio<br>en la última semana</br>"),
+                                hovertemplate='<b>%{customdata}</b><br>Defunciones promedio: %{z:>7.2f}</br><extra></extra>'))
+    layout = go.Layout(mapbox = dict(center= {'lat':23.7,'lon':-103},
+                                    zoom=4,style="carto-positron"),
+                        margin={"r":0,"t":0,"l":0,"b":0},height=600,width=1000)
+    layout.update(
+        updatemenus=[
+            dict(direction="down",
+                x=0,
+                xanchor="left",
+                y=1.1,
+                yanchor="top",
+                buttons=list([
+                    dict(label="Casos confirmados (variación)",
+                        method="update",
+                        args=[{"visible": [True, False,False,False]}]),
+                    dict(label="Defunciones confirmadas (variación)",
+                        method="update",
+                        args=[{"visible": [False,True,False,False]}]),
+                    dict(label="Casos confirmados",
+                        method="update",
+                        args=[{"visible": [False,False,True,False]}]),
+                    dict(label="Defunciones confirmadas",
+                        method="update",
+                        args=[{"visible": [False,False,False,True]}])
+                ]),
+            )
+        ])
+    fig=go.Figure(data,layout)
     fig.write_html('../templates/mapa_covid.html')
 
 
@@ -525,11 +584,11 @@ def graficar_mapa_desempleo():
     fig.write_html('../templates/mapa_desempleo.html')
 
 if (__name__)=='__main__':
-    #graficar_pib()
-    #graficar_inflacion()
-    #graficar_tasas_interes()
-    #graficar_tipo_cambio()
-    #graficar_covid_total()
-    #graficar_heatmap_covid()
+    graficar_pib()
+    graficar_inflacion()
+    graficar_tasas_interes()
+    graficar_tipo_cambio()
+    graficar_covid_total()
+    graficar_heatmap_covid()
     graficar_mapa_covid()
     graficar_mapa_desempleo()
