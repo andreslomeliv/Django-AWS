@@ -1,0 +1,89 @@
+<head>
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css" />
+    <link href="https://unpkg.com/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
+</head>
+{% block tab_graficas %}
+<div x-data="{ openTab: 1 }" class="p-6">
+    <ul class="flex border-b">
+        <li @click="openTab = 1" :class="{ '-mb-px': openTab === 1 }" class="-mb-px mr-1">
+            <a :class="openTab === 1 ? 'border-l border-t border-r rounded-t text-blue-700' : 'text-blue-500 hover:text-blue-800'" class="bg-white inline-block py-2 px-4 font-semibold" href="#">
+            PIB      
+        </a>
+        </li>
+        <li @click="openTab = 2" :class="{ '-mb-px': openTab === 2 }" class="mr-1">
+            <a :class="openTab === 2 ? 'border-l border-t border-r rounded-t text-blue-700' : 'text-blue-500 hover:text-blue-800'" class="bg-white inline-block py-2 px-4 font-semibold" href="#">
+            Inflación
+        </a>
+        </li>
+        <li @click="openTab = 3" :class="{ '-mb-px': openTab === 3 }" class="mr-1">
+            <a :class="openTab === 3 ? 'border-l border-t border-r rounded-t text-blue-700' : 'text-blue-500 hover:text-blue-800'" class="bg-white inline-block py-2 px-4 font-semibold" href="#">
+            Tasas de interés
+        </a>
+        </li>
+        <li @click="openTab = 4" :class="{ '-mb-px': openTab === 4 }" class="mr-1">
+            <a :class="openTab === 4 ? 'border-l border-t border-r rounded-t text-blue-700' : 'text-blue-500 hover:text-blue-800'" class="bg-white inline-block py-2 px-4 font-semibold" href="#">
+            Tipos de cambio
+        </a>
+        </li>
+        <li @click="openTab = 5" :class="{ '-mb-px': openTab === 5 }" class="mr-1">
+            <a :class="openTab === 5 ? 'border-l border-t border-r rounded-t text-blue-700' : 'text-blue-500 hover:text-blue-800'" class="bg-white inline-block py-2 px-4 font-semibold" href="#">
+            Desempleo     
+        </a>
+        </li>
+        <li @click="openTab = 6" :class="{ '-mb-px': openTab === 6 }" class="mr-1">
+            <a :class="openTab === 6 ? 'border-l border-t border-r rounded-t text-blue-700' : 'text-blue-500 hover:text-blue-800'" class="bg-white inline-block py-2 px-4 font-semibold" href="#">
+            COVID-19    
+        </a>
+        </li>
+    </ul>
+    <div class="w-full pt-4">
+        <div class="columns is-centered" id="grafica_pib" x-show="openTab === 1">
+            {% include "grafica_pib.html" %}
+        </div>
+        <div class="columns is-centered" id="grafica_inflacion" x-show="openTab === 2">
+            {% include "grafica_inflacion.html" %}
+        </div>
+        <div class="columns is-centered" id="grafica_tasas" x-show="openTab === 3">
+            {% include "grafica_tasas_interes.html" %}
+        </div>
+        <div class="columns is-centered" id="grafica_cambio" x-show="openTab === 4">
+            {% include "grafica_tipo_cambio.html" %}
+        </div>
+        <div class="columns is-centered" id="grafica_desempleo" x-show="openTab === 5">
+            {% include "mapa_desempleo.html" %}
+        </div>
+        <div id="grafica_covid" x-show="openTab === 6">
+            <div>
+                <div class="columns is-centered">
+                    <h1 class="subtitle is-3">Casos y defunciones nacionales</h1>
+                </div>
+                <div class="columns is-centered">
+                    {% include "grafica_covid_total.html" %}
+                </div>
+            </div>
+            <div>
+                <div class="columns is-centered">
+                    <h1 class="subtitle is-3">Heatmap de casos por estado</h1>
+                </div>
+                <div class="columns is-centered">
+                    {% include "heatmap_covid.html" %}
+                </div>
+            </div>
+            <div>
+                <div class="columns is-centered">
+                    <h1 class="subtitle is-3">Mapa</h1>
+                </div>
+                <div class="columns is-centered">
+                    {% include "mapa_covid.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alpine.js -->
+<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+{% endblock %}
