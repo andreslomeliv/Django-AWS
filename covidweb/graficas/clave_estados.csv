@@ -1,0 +1,37 @@
+,CODE,NAME,cve
+0,MX01,Aguascalientes,1
+1,MX02,Baja California,2
+2,MX03,Baja California Sur,3
+3,MX04,Campeche,4
+4,MX05,Chiapas,5
+5,MX06,Chihuahua,6
+6,MX09,Ciudad de México,7
+7,MX07,Coahuila,8
+8,MX08,Colima,9
+9,MX10,Durango,10
+10,MX11,Guanajuato,11
+11,MX12,Guerrero,12
+12,MX13,Hidalgo,13
+13,MX14,Jalisco,14
+14,MX16,Michoacán,15
+15,MX17,Morelos,16
+16,MX15,México,17
+17,MX18,Nayarit,18
+18,MX19,Nuevo León,19
+19,MX20,Oaxaca,20
+20,MX21,Puebla,21
+21,MX22,Querétaro,22
+22,MX23,Quintana Roo,23
+23,MX24,San Luis Potosí,24
+24,MX25,Sinaloa,25
+25,MX26,Sonora,26
+26,MX27,Tabasco,27
+27,MX28,Tamaulipas,28
+28,MX29,Tlaxcala,29
+29,MX30,Veracruz,30
+30,MX31,Yucatán,31
+31,MX32,Zacatecas,32
+32,,Estados Unidos Mexicanos,36
+33,,No Aplica,97
+34,,Se Ignora,98
+35,,No Especificado,99
