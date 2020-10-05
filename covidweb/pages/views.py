@@ -9,8 +9,7 @@ def grafica_view(request,*args,**kwargs):
 	return render(request,"graficas.html")
 
 def priviet_view(request,*args,**kwargs):
-	print(request.user,"is being a kuk")
-	return HttpResponse("<h1>priviet ma nigga welcome \n to the bonezone fuk</h1>")
+	return HttpResponse("<h1>Prueba del sitio</h1>")
 
 
 def contact_view(request,*args,**kwargs):
